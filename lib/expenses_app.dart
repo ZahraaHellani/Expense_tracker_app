@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'models/expense.dart';
+import 'widgets/expenses_list.dart';
 
 class ExpenseApp extends StatefulWidget {
-  // registeredExpensesList is not anymore a private fixed list, it is now loaded from the database and passed to ExpenseApp from main.dart
-  const ExpenseApp({super.key});
+  const ExpenseApp({
+    super.key,
+    required this.registeredExpensesList,
+    required this.onDeleteExpense,
+    });
+
+  final List<Expense> registeredExpensesList;
+  final void Function(Expense) onDeleteExpense;
 
   @override 
   State<ExpenseApp> createState() => _ExpenseAppState();
@@ -28,14 +35,44 @@ class _ExpenseAppState extends State<ExpenseApp> {
       date: DateTime.now(),
       title: 'Movie',
       category: Category.leisure
+    ),
+    Expense(
+      amount: 20,
+      date: DateTime.now(),
+      title: 'Paris',
+      category: Category.travel
     )
   ];
 
   @override
   Widget build(BuildContext context) {
+    Widget mainContent = Padding(
+      padding: const EdgeInsets.all(10),
+      child: Center(
+        child: Text(
+          'No expenses found! Add some, or select a different filter',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 18,
+          ),
+        ),
+      ),
+    );
+    if (widget.registeredExpensesList.isNotEmpty) {
+      mainContent = ExpensesList(
+        expensesList: widget.registeredExpensesList,
+        onDeleteExpense: widget.onDeleteExpense,
+      );
+    }
     return Scaffold(
-      appBar: AppBar(title: const Text('Expenses')),
-      body: const Center(child: Text('Expenses home')),
+      body: Column(
+        children: [
+          Expanded(
+            child: mainContent,
+          ),
+        ],
+      ),
     );
   }
 }
